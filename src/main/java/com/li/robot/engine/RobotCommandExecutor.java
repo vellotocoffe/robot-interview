@@ -1,17 +1,20 @@
 package com.li.robot.engine;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.li.robot.enums.Direction;
+import com.li.robot.exception.RobotCommandValidationException;
+import com.li.robot.exception.RobotFallingException;
 import com.li.robot.model.Robot;
 
 @Component
 public class RobotCommandExecutor {
 
-	private static final String[] SUPPORTED_CMDS = { "place", "left", "right", "report", "move" };
+	private static final String[] SUPPORTED_CMDS = { "PLACE", "LEFT", "RIGHT", "REPORT", "MOVE" };
 
 	@Autowired
 	private Robot targetRobot;
@@ -24,27 +27,25 @@ public class RobotCommandExecutor {
 		this.targetRobot = targetRobot;
 	}
 
-	public void executeCommand(String name, String... args) {
-		/*check if command is valid*/
-		if (!isValidated(name, args)) {
-			return;
-		}
-		/*execute command according to name*/
+	public void executeCommand(String name, String... args) throws RobotFallingException, RobotCommandValidationException {
+		/* check if command is valid */
+		validate(name, args);
+		/* execute command according to name */
+		name = name.toUpperCase();
 		switch (name) {
-		case "place":
+		case "PLACE":
 			this.targetRobot.place(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Direction.valueOf(args[2]));
 			break;
-
-		case "move":
+		case "MOVE":
 			this.targetRobot.move();
 			break;
-		case "left":
+		case "LEFT":
 			this.targetRobot.turnLeft();
 			break;
-		case "right":
+		case "RIGHT":
 			this.targetRobot.turnRight();
 			break;
-		case "report":
+		case "REPORT":
 			this.targetRobot.report();
 			break;
 		default:
@@ -52,42 +53,34 @@ public class RobotCommandExecutor {
 		}
 	}
 
-	
 	/**
-	 * Validate user inputs (this part should be achieved by javax validation api in real codes)
-	 * */
-	private boolean isValidated(String name, String... args) {
-		if(name == null || name.isBlank() || name.isEmpty()) {
-			System.err.println("Please enter a valid command.");
-			return false;
-		}
-		/*verify if command is supported*/
+	 * Validate user inputs (this part should be achieved by javax validation api in
+	 * real codes)
+	 */
+	private void validate(String name, String... args) {
+		name = name.toUpperCase();
+		/* verify if command is supported */
 		if (!Arrays.asList(SUPPORTED_CMDS).contains(name)) {
-			System.err.println("Command not supported.");
-			return false;
+			throw new RobotCommandValidationException(name,args);
 		}
-		/*robot should be placed before executing other commands*/
-		if (!"place".equals(name) && !this.targetRobot.isPlaced()) {
-			System.err.println("Please place the robot on table first.");
-			return false;
+		/* robot should be placed before executing other commands */
+		if (!"PLACE".equals(name) && !this.targetRobot.isPlaced()) {
+			throw new RobotCommandValidationException("Robot should be placed at first.");
 		}
-		/*place command needs 3 arguments*/
-		if (args != null && args.length != 3) {
-			System.err.println("Command not supported.");
-			return false;
-		}
-		/*place command needs 2 digits and a valid direction*/
-		if(args.length == 3) {
-			try {
-				Integer.valueOf(args[0]);
-				Integer.valueOf(args[1]);
-				Direction.valueOf(args[2]);
-			}catch(IllegalArgumentException e) {
-				System.err.println("Args format not correct.");
-				return false;
+		/* validate place command */
+		if ("PLACE".equals(name) && !Objects.isNull(args)) {
+			if (args.length != 3) {
+				throw new RobotCommandValidationException(name,args);
+			} else {
+				try {
+					Integer.valueOf(args[0]);
+					Integer.valueOf(args[1]);
+					Direction.valueOf(args[2]);
+				} catch (IllegalArgumentException e) {
+					throw new RobotCommandValidationException(name,args);
+				}
 			}
 		}
-		return true;
 	}
 
 }

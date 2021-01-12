@@ -3,17 +3,19 @@ package com.li.robot.model;
 import org.springframework.stereotype.Component;
 
 import com.li.robot.enums.Direction;
+import com.li.robot.exception.RobotFallingException;
 import com.li.robot.features.MyRobotV1;
 
 @Component
 public class Robot implements MyRobotV1 {
 
+	private final static int MAX_POSITION = 4;
+	private final static int MIN_POSITION = 0;
+
 	private int xPosition;
 	private int yPosition;
 	private Direction direction;
 	private boolean placed = false;
-	private final static int MAX_POSITION = 4;
-	private final static int MIN_POSITION = 0;
 
 	public boolean isPlaced() {
 		return this.placed;
@@ -94,21 +96,29 @@ public class Robot implements MyRobotV1 {
 		case NORTH:
 			if (!isFalling(this.yPosition + 1)) {
 				this.yPosition++;
+			} else {
+				throw new RobotFallingException(this.xPosition, this.yPosition + 1);
 			}
 			break;
 		case SOUTH:
 			if (!isFalling(this.yPosition - 1)) {
 				this.yPosition--;
+			} else {
+				throw new RobotFallingException(this.xPosition, this.yPosition - 1);
 			}
 			break;
 		case WEST:
 			if (!isFalling(this.xPosition - 1)) {
 				this.xPosition--;
+			} else {
+				throw new RobotFallingException(this.xPosition - 1, this.yPosition);
 			}
 			break;
 		case EAST:
 			if (!isFalling(this.xPosition + 1)) {
 				this.xPosition++;
+			} else {
+				throw new RobotFallingException(this.xPosition + 1, this.yPosition);
 			}
 			break;
 		default:
@@ -118,15 +128,13 @@ public class Robot implements MyRobotV1 {
 
 	@Override
 	public void report() {
-		System.out.println(String.format("current position %s,%s, current direction %s", this.xPosition, this.yPosition,
-				this.direction));
+		System.out.println(String.format("%s,%s,%s", this.xPosition, this.yPosition, this.direction.name()));
 	}
 
 	@Override
 	public void place(int xPosition, int yPosition, Direction direction) {
-		if(isFalling(xPosition) || isFalling(yPosition)) {
-			System.err.println("Your robot is about falling, command ignored.");
-			return;
+		if (isFalling(xPosition) || isFalling(yPosition)) {
+			throw new RobotFallingException(xPosition, yPosition);
 		}
 		this.placed = true;
 		this.xPosition = xPosition;
