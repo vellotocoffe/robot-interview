@@ -27,12 +27,15 @@ public class RobotCommandExecutor {
 		this.targetRobot = targetRobot;
 	}
 
+	/**
+	 * Execute command given by user against for current robot.
+	 * @param name command name
+	 * @param args command arguments
+	 * @throws RobotFallingException, RobotFallingException
+	 * */
 	public void executeCommand(String name, String... args) throws RobotFallingException, RobotCommandValidationException {
-		/* user can input lower case command name */
 		name = name.toUpperCase();
-		/* check if command is valid */
 		validate(name, args);
-		/* execute command according to name */
 		switch (RobotCommand.valueOf(name)) {
 			case PLACE:
 				this.targetRobot.place(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Direction.valueOf(args[2]));
@@ -56,7 +59,9 @@ public class RobotCommandExecutor {
 
 	/**
 	 * Validate user inputs (this part should be achieved by javax validation api in
-	 * real codes)
+	 * real codes).
+	 * @param name command name
+	 * @param args command arguments
 	 */
 	private void validate(String name, String... args) {
 		/* verify if command is supported */

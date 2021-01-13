@@ -23,6 +23,7 @@ class RobotApplicationTests {
 		robot = new Robot();
 		robot.setMaxPosition(4);
 		robot.setMinPosition(0);
+		robot.setMoveUnit(1);
 		commandExecutor.setTargetRobot(robot);
 	}
 

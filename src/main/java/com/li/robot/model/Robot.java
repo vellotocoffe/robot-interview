@@ -14,6 +14,8 @@ public class Robot implements MyRobotV1 {
 	private  int maxPosition;
 	@Value("${robot.min.position}")
 	private  int minPosition;
+	@Value("${robot.move.unit}")
+	private int moveUnit;
 
 	private int xPosition;
 	private int yPosition;
@@ -59,6 +61,14 @@ public class Robot implements MyRobotV1 {
 
 	public void setDirection(Direction direction) {
 		this.direction = direction;
+	}
+	
+	public int getMoveUnit() {
+		return moveUnit;
+	}
+
+	public void setMoveUnit(int moveUnit) {
+		this.moveUnit = moveUnit;
 	}
 
 	public boolean isPlaced() {
@@ -116,33 +126,39 @@ public class Robot implements MyRobotV1 {
 
 	@Override
 	public void move() {
+		int nextYPosition;
+		int nextXPosition;
 		switch (this.direction) {
 			case NORTH:
-				if (!isFalling(this.yPosition + 1)) {
-					this.yPosition++;
+				nextYPosition = this.yPosition + this.moveUnit;
+				if (!isFalling(nextYPosition)) {
+					this.yPosition = nextYPosition;
 				} else {
-					throw new RobotFallingException(this.xPosition, this.yPosition + 1);
+					throw new RobotFallingException(this.xPosition, nextYPosition);
 				}
 				break;
 			case SOUTH:
-				if (!isFalling(this.yPosition - 1)) {
-					this.yPosition--;
+				nextYPosition = this.yPosition - this.moveUnit;
+				if (!isFalling(nextYPosition)) {
+					this.yPosition = nextYPosition;
 				} else {
-					throw new RobotFallingException(this.xPosition, this.yPosition - 1);
+					throw new RobotFallingException(this.xPosition, nextYPosition);
 				}
 				break;
 			case WEST:
-				if (!isFalling(this.xPosition - 1)) {
-					this.xPosition--;
+				nextXPosition = this.xPosition - this.moveUnit;
+				if (!isFalling(nextXPosition)) {
+					this.xPosition = nextXPosition;
 				} else {
-					throw new RobotFallingException(this.xPosition - 1, this.yPosition);
+					throw new RobotFallingException(nextXPosition, this.yPosition);
 				}
 				break;
 			case EAST:
-				if (!isFalling(this.xPosition + 1)) {
-					this.xPosition++;
+				nextXPosition = this.xPosition + this.moveUnit;
+				if (!isFalling(nextXPosition)) {
+					this.xPosition = nextXPosition;
 				} else {
-					throw new RobotFallingException(this.xPosition + 1, this.yPosition);
+					throw new RobotFallingException(nextXPosition, this.yPosition);
 				}
 				break;
 			default:
