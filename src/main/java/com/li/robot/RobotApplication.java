@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.util.StringUtils;
 
 import com.li.robot.engine.RobotCommandExecutor;
+import com.li.robot.enums.RobotCommand;
 import com.li.robot.exception.RobotCommandValidationException;
 import com.li.robot.exception.RobotFallingException;
 
@@ -24,7 +25,7 @@ public class RobotApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//a scanner waiting for user input from system.in
+		// a scanner waiting for user input from system.in
 		Scanner sc = new Scanner(System.in);
 		while (true) {
 			System.out.println("Please input commmand (enter quit to exit) :");
@@ -33,20 +34,22 @@ public class RobotApplication implements CommandLineRunner {
 				System.err.println("Please enter a valid command name.");
 				continue;
 			}
-			if("quit".equals(userInput)) {
-				System.out.println("Merci au revoir.");
+			if (RobotCommand.QUIT.toString().equals(userInput.toUpperCase())) {
 				sc.close();
 				return;
 			}
-			String[] userInputs = userInput.split(" ");
-			String commandName = userInputs[0];
-			String[] commandArgs = userInputs.length == 1 ? null : userInputs[1].split(",");
-			try {
-				this.robotCommandExecutor.executeCommand(commandName, commandArgs);
-			}catch(RobotFallingException | RobotCommandValidationException e) {
-				System.err.println(e.getMessage());
-			}
-			
+			executeCommand(userInput);
+		}
+	}
+
+	private void executeCommand(String userInput) {
+		String[] userInputs = userInput.split(" ");
+		String commandName = userInputs[0];
+		String[] commandArgs = userInputs.length == 1 ? null : userInputs[1].split(",");
+		try {
+			this.robotCommandExecutor.executeCommand(commandName, commandArgs);
+		} catch (RobotFallingException | RobotCommandValidationException e) {
+			System.err.println(e.getMessage());
 		}
 	}
 

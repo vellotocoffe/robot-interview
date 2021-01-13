@@ -15,11 +15,15 @@ import com.li.robot.model.Robot;
 class RobotApplicationTests {
 
 	private RobotCommandExecutor commandExecutor;
+	private Robot robot;
 
 	@BeforeEach
 	public void init() {
 		commandExecutor = new RobotCommandExecutor();
-		commandExecutor.setTargetRobot(new Robot());
+		robot = new Robot();
+		robot.setMaxPosition(4);
+		robot.setMinPosition(0);
+		commandExecutor.setTargetRobot(robot);
 	}
 
 	@Test
