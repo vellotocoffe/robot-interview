@@ -3,15 +3,16 @@ package com.li.robot;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.li.robot.engine.RobotCommandExecutor;
 import com.li.robot.enums.RobotCommand;
 import com.li.robot.exception.RobotCommandValidationException;
 import com.li.robot.exception.RobotFallingException;
+import com.li.robot.features.CommandExecutor;
 
 @Component
 public class RobotCommandRunner implements CommandLineRunner {
@@ -19,7 +20,8 @@ public class RobotCommandRunner implements CommandLineRunner {
 	private static final String SPACE = " ";
 
 	@Autowired
-	private RobotCommandExecutor robotCommandExecutor;
+	@Qualifier("robotCmdExector")
+	private CommandExecutor robotCommandExecutor;
 
 	@Value("${cmd.args.delimiter}")
 	private String argsDelimiter;
@@ -35,6 +37,7 @@ public class RobotCommandRunner implements CommandLineRunner {
 				continue;
 			}
 			if (RobotCommand.QUIT.toString().equals(userInput.toUpperCase())) {
+				robotCommandExecutor.close();
 				sc.close();
 				return;
 			}

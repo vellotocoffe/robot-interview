@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 import com.li.robot.enums.Direction;
 import com.li.robot.enums.RobotCommand;
 import com.li.robot.exception.RobotCommandValidationException;
-import com.li.robot.exception.RobotFallingException;
+import com.li.robot.features.CommandExecutor;
 import com.li.robot.model.Robot;
 
-@Component
-public class RobotCommandExecutor {
+@Component("robotCmdExector")
+public class RobotCommandExecutor extends CommandExecutor{
 
 	@Autowired
 	private Robot targetRobot;
@@ -28,42 +28,13 @@ public class RobotCommandExecutor {
 	}
 
 	/**
-	 * Execute command given by user against for current robot.
-	 * @param name command name
-	 * @param args command arguments
-	 * @throws RobotFallingException, RobotFallingException
-	 * */
-	public void executeCommand(String name, String... args) throws RobotFallingException, RobotCommandValidationException {
-		name = name.toUpperCase();
-		validate(name, args);
-		switch (RobotCommand.valueOf(name)) {
-			case PLACE:
-				this.targetRobot.place(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Direction.valueOf(args[2]));
-				break;
-			case MOVE:
-				this.targetRobot.move();
-				break;
-			case LEFT:
-				this.targetRobot.turnLeft();
-				break;
-			case RIGHT:
-				this.targetRobot.turnRight();
-				break;
-			case REPORT:
-				this.targetRobot.report();
-				break;
-			default:
-				break;
-			}
-	}
-
-	/**
 	 * Validate user inputs (this part should be achieved by javax validation api in
 	 * real codes).
 	 * @param name command name
 	 * @param args command arguments
 	 */
-	private void validate(String name, String... args) {
+	@Override
+	public void validate(String name, String... args) {
 		/* verify if command is supported */
 		if (!RobotCommand.isValidCommand(name)) {
 			throw new RobotCommandValidationException(name,args);
@@ -86,6 +57,30 @@ public class RobotCommandExecutor {
 				}
 			}
 		}
+		
+	}
+
+	@Override
+	public void execute(String name, String... args) {
+		switch (RobotCommand.valueOf(name)) {
+			case PLACE:
+				this.targetRobot.place(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Direction.valueOf(args[2]));
+				break;
+			case MOVE:
+				this.targetRobot.move();
+				break;
+			case LEFT:
+				this.targetRobot.turnLeft();
+				break;
+			case RIGHT:
+				this.targetRobot.turnRight();
+				break;
+			case REPORT:
+				this.targetRobot.report();
+				break;
+			default:
+				break;
+			}
 	}
 
 }
