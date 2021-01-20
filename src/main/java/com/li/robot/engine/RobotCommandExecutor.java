@@ -44,8 +44,8 @@ public class RobotCommandExecutor extends CommandExecutor{
 			throw new RobotCommandValidationException("Robot should be placed at first.");
 		}
 		/* validate place command */
-		if (RobotCommand.PLACE.toString().equals(name) && !Objects.isNull(args)) {
-			if (RobotCommand.PLACE.getArgsNum() != args.length ) {
+		if (RobotCommand.PLACE.toString().equals(name)) {
+			if (Objects.isNull(args) || RobotCommand.PLACE.getArgsNum() != args.length ) {
 				throw new RobotCommandValidationException(name,args);
 			} else {
 				String regex = "[0-9]+";

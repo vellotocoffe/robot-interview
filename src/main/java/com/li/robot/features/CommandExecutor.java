@@ -5,11 +5,13 @@ package com.li.robot.features;
  */
 public abstract class CommandExecutor {
 
-	public void executeCommand(String name, String... args) {
+	/**
+	 * Concrete final method cannot not be overridden for keeping template steps.
+	 * */
+	public final void executeCommand(String name, String... args) {
 		name = name.toUpperCase();
 		this.validate(name, args);
 		this.execute(name, args);
-		this.close();
 	}
 	
 	/**
